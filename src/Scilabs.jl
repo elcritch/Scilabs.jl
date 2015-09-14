@@ -13,7 +13,7 @@ using Pipe
 include("Fitting.jl")
 
 
-export HTML, writemime, load_md_table
+export HTML, writemime, load_md_table, glob, @pipe, @ls, filter, @_
 
 type HTML
    s::String
@@ -25,6 +25,28 @@ function writemime(io::IO, ::MIME"text/html", x::HTML)
     write(io, x.s);
 end
 
+function gpath(xs; path=".")
+    res = glob(xs, path)
+    isempty(res) && error("File not found for pattern: `$xs` in path: `$(path |> realpath)`")
+    res |> first
+end
+
+macro ls()
+    :( readdir() )
+end
+
+import Base.filter
+
+function filter(foo::Function)
+    function filterCurry(xs)
+        return filter(foo, xs)
+    end
+    return filterCurry
+end
+
+macro _(xs)
+    :( _ -> $(xs) )
+end
 
 ## Array indexes
 
@@ -36,6 +58,11 @@ end
 
 ±(x,y) = range(x,y,0)
 .==(arr::Array,y::FloatRange) = [ isapprox(x,y.start, atol=y.step) for x in arr ]
+
+⊂(x::String, xs::String) = contains(xs, x)
+⊂(x::String, name::Symbol) = xs -> contains(xs, x)
+
+export ⊂, ±, .==, ≈
 
 ## Dictionary Handling ##
 
