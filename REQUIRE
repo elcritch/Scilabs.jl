@@ -4,3 +4,15 @@
 # If no REQUIRE file is present, it means there are no requirements.
 # See README.md for more details.
 julia 0.3
+DataStructures 
+Compat
+Glob
+Pipe
+JSON
+MAT
+Distributions
+GLM
+Optim
+Formatting
+Match
+# using Memoize
