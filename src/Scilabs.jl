@@ -10,14 +10,13 @@ using Match
 using Pipe
 # using Memoize
 
-include("Fitting.jl")
 
-
-export HTML, writemime, load_md_table, glob, @pipe, @ls, filter, @_
+export HTML, writemime, load_md_table, glob, @pipe, @ls, filter, @_, gpath
 
 type HTML
    s::String
 end
+
 
 import Base.writemime
 
@@ -81,7 +80,7 @@ simplify_mat(o::Any) = o
 
 ## Markdown Helpers
 
-function load_md_table(testfile; f::Function=(x)->x)
+function load_md_table_raw(testfile; f::Function=(x)->x)
     tests = open("$testfile") do f readlines(f) end
     headers = tests[1] |> markdownsplitter |> xs->map(lowercase, xs) |> xs->map(symbol, xs)
     @show headers
@@ -89,11 +88,27 @@ function load_md_table(testfile; f::Function=(x)->x)
     @pipe( tests[3:end]
         |> map(markdownsplitter,_)
         |> filter( l -> any(  x -> !isempty(x), l), _)
-        |> map(dictFromArray(headers),_)
         |> map(f,_)
+        |> map(dictFromArray(headers),_)
     )
 end
 
+function load_md_table(testfile)
+
+    function parser(x)
+        asint(i) = try int(i) catch () end
+        asfloat(i) = try float(i) catch () end
+        y = ()
+        if (isempty(y)) y = asint(x) end
+        if (isempty(y)) y = asfloat(x) end
+        if (isempty(y)) y = x end
+        return y
+    end
+
+    load_md_table_raw(testfile, f= x->map(parser,x))
+end
+
+include("Fitting.jl")
 
 
 end

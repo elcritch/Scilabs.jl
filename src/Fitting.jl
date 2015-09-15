@@ -2,8 +2,15 @@ module Fitting
 
 using Distributions
 using Optim
+using GLM
+using Formatting
 
-export fit_weibul, simple_fit, r2, min_sqerror_with
+export fit_weibul, simple_fit, r2, min_sqerror_with, ff
+
+
+function ff(f::Real, n::Int=1)
+    abs(f) < 1/10^n || abs(f) > 10^n ? fmt(FormatSpec(".$(n)e"), f) : fmt(FormatSpec(".$(n)f"), f)
+end
 
 function fit_weibul(data)
 
