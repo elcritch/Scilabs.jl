@@ -8,6 +8,8 @@ using MAT
 using Glob
 using Match
 using Pipe
+using Compose
+
 # using Memoize
 
 
@@ -15,6 +17,10 @@ export HTML, writemime, load_md_table, glob, @pipe, @ls, filter, @_, gpath
 
 type HTML
    s::String
+
+   HTML(s) = new(s)
+
+   HTML(s::Context) = new(stringmime("text/html",s))
 end
 
 
