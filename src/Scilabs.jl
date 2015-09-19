@@ -1,5 +1,6 @@
 module Scilabs
 
+using Compat
 using DataStructures
 using Distributions
 using GLM
@@ -8,27 +9,38 @@ using MAT
 using Glob
 using Match
 using Pipe
-using Compose
 
+# using Compose
 # using Memoize
 
+export Web, writemime, load_md_table, glob, @pipe, @ls, filter, @_, gpath
 
-export HTML, writemime, load_md_table, glob, @pipe, @ls, filter, @_, gpath
+# if VERSION > v"0.3"
+#
+#     using Base.HTML
+#
+#     HTML(s::String) = new(s)
+#
+#     HTML(s) = new(stringmime("text/html",s))
+#
+# else
 
-type HTML
-   s::String
 
-   HTML(s) = new(s)
+    type Web
+       content::String
 
-   HTML(s::Context) = new(stringmime("text/html",s))
-end
+       Web(s::String) = new(s)
 
+       Web(s) = new(stringmime("text/html",s))
+    end
 
-import Base.writemime
+    import Base.writemime
 
-function writemime(io::IO, ::MIME"text/html", x::HTML)
-    write(io, x.s);
-end
+    function writemime(io::IO, ::MIME"text/html", x::Web)
+        write(io, x.content);
+    end
+
+# end
 
 function gpath(xs; path=".")
     res = glob(xs, path)
@@ -42,6 +54,13 @@ end
 
 import Base.filter
 
+function contains(s::String)
+    function containsCurry(xs)
+        return contains(xs, s)
+    end
+    return containsCurry
+end
+
 function filter(foo::Function)
     function filterCurry(xs)
         return filter(foo, xs)
@@ -54,6 +73,8 @@ macro _(xs)
 end
 
 ## Array indexes
+import Base.(.==)
+import Base.∪
 
 ≈(x,y::Real) = isapprox(x, y)
 ≈(x,yt::Tuple) = isapprox(x, yt[1], atol=yt[2])
@@ -67,7 +88,7 @@ end
 ⊂(x::String, xs::String) = contains(xs, x)
 ⊂(x::String, name::Symbol) = xs -> contains(xs, x)
 
-export ⊂, ±, .==, ≈
+export ⊂, ±, .==, ≈, ∪, ⊂
 
 ## Dictionary Handling ##
 
@@ -75,8 +96,10 @@ markdownsplitter(x::String) = @pipe x |> strip(_) |> strip(_,'|') |> split(_,'|'
 dictFromArray(fields) = x -> OrderedDict(zip(fields,x))
 arrayFromDictKeyArray(d::Dict, keys::Array, exclude...) = [ d[k] for k in filter(x-> !(x in exclude),keys) ]
 
+
 ⊂(d::Dict, keys::Array) = Dict( [ k=>v for (k,v) in filter((x,y)-> in(x,Set(keys)),d) ] )
 ∪(u::Dict, v::Dict) = Dict( concat(u ⊂ collect(keys(v)),v) )
+
 
 ## Matrix Helpers
 
@@ -102,8 +125,8 @@ end
 function load_md_table(testfile)
 
     function parser(x)
-        asint(i) = try int(i) catch () end
-        asfloat(i) = try float(i) catch () end
+        asint(i) = try parse(Int, i) catch () end
+        asfloat(i) = try parse(Float, i) catch () end
         y = ()
         if (isempty(y)) y = asint(x) end
         if (isempty(y)) y = asfloat(x) end

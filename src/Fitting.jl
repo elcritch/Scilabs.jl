@@ -1,5 +1,6 @@
 module Fitting
 
+using Compat
 using Distributions
 using Optim
 using GLM
@@ -37,8 +38,8 @@ function simple_fit(x, y)
 
     fit_r2 = r2(y, fit);
 
-    return { :fit => fit, :r2 => fit_r2, :a => a, :b => b, :f => (x -> a*x + b),
-        :fstr => "\$$( ff(a,1)) \\,x + $(ff(b,1))\$"  }
+    return @compat Dict( :fit => fit, :r2 => fit_r2, :a => a, :b => b, :f => (x -> a*x + b),
+        :fstr => "\$$( ff(a,1)) \\,x + $(ff(b,1))\$"  )
 end
 
 function r2(ydata, fit)
