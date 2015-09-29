@@ -13,7 +13,7 @@ using Pipe
 # using Compose
 # using Memoize
 
-export Web, writemime, load_md_table, glob, @pipe, @ls, filter, @_, gpath
+export Web, writemime, load_md_table, glob, @pipe, @ls, filter, @_, gpath, load_csv_table
 
 # if VERSION > v"0.3"
 #
@@ -136,6 +136,28 @@ function load_md_table(testfile)
 
     load_md_table_raw(testfile, f= x->map(parser,x))
 end
+
+function load_csv_table(testfile; usesymbols=false)
+    dataMat = readcsv(testfile)
+    
+    if usesymbols
+        headers = Symbol[ symbol(d) for d in dataMat[1,:] ]
+    else
+        headers = String[ string(d) for d in dataMat[1,:] ]
+    end
+    
+    makeRow = dictFromArray(headers)    
+    @show(headers, size(dataMat))
+    
+    dat = Any[ ]
+    for i in 2:size(dataMat)[1]
+        row = dataMat[i,:]
+        push!(dat, makeRow(row))
+    end
+    
+    return dat
+end
+
 
 include("Fitting.jl")
 
