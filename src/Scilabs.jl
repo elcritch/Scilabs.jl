@@ -14,34 +14,30 @@ using Pipe
 # using Memoize
 
 export Web, writemime, load_md_table, glob, @pipe, @ls, filter, @_, gpath, load_csv_table
-
-# if VERSION > v"0.3"
-#
-#     using Base.HTML
-#
-#     HTML(s::String) = new(s)
-#
-#     HTML(s) = new(stringmime("text/html",s))
-#
-# else
+export disp, OrderedDict
 
 
-    type Web
-       content::String
+## Notebook Web Content
+type Web
+   content::String
 
-       Web(s::String) = new(s)
+   Web(s::String) = new(s)
 
-       Web(s) = new(stringmime("text/html",s))
-    end
+   Web(s) = new(stringmime("text/html",s))
+end
 
-    import Base.writemime
+import Base.writemime
 
-    function writemime(io::IO, ::MIME"text/html", x::Web)
-        write(io, x.content);
-    end
+function writemime(io::IO, ::MIME"text/html", x::Web)
+    write(io, x.content);
+end
 
-# end
+function disp(x)
+	display(Web(x))
+end
 
+
+## Path Helpers
 function gpath(xs; path=".")
     res = glob(xs, path)
     isempty(res) && error("File not found for pattern: `$xs` in path: `$(path |> realpath)`")
