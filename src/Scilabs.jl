@@ -13,7 +13,10 @@ using Pipe
 # using Compose
 # using Memoize
 
-export Web, writemime, load_md_table, glob, @pipe, @ls, filter, @_, gpath, load_csv_table
+export Web, writemime, load_md_table, glob, @pipe, @ls, @_, gpath, load_csv_table
+export OrderedDict, disp, 
+export sort, filter
+
 
 # if VERSION > v"0.3"
 #
@@ -39,6 +42,9 @@ export Web, writemime, load_md_table, glob, @pipe, @ls, filter, @_, gpath, load_
     function writemime(io::IO, ::MIME"text/html", x::Web)
         write(io, x.content);
     end
+
+
+disp(x) = display(Web(x))
 
 # end
 
@@ -66,6 +72,14 @@ function filter(foo::Function)
         return filter(foo, xs)
     end
     return filterCurry
+end
+
+import Base.sort
+function sort(foo::Function)
+    function sortCurry(xs)
+        return sort(foo, xs)
+    end
+    return sortCurry
 end
 
 macro _(xs)
@@ -141,7 +155,7 @@ function load_csv_table(testfile; usesymbols=false)
     dataMat = readcsv(testfile)
     
     if usesymbols
-        headers = Symbol[ symbol(d) for d in dataMat[1,:] ]
+        headers = Symbol[ symbol(lowercase(d)) for d in dataMat[1,:] ]
     else
         headers = String[ string(d) for d in dataMat[1,:] ]
     end
