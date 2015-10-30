@@ -51,6 +51,7 @@ function remove_all_borders(ax)
 end
 
 function set_max_ticks(ax)
+	using PyCall
 	@pyimport matplotlib.ticker as ticker
 	
     ax[:yaxis][:set_major_locator](ticker.MaxNLocator(5) )
