@@ -1,8 +1,11 @@
 module PyPlotHelpers
 
+using PyCall
+@pyimport matplotlib.ticker as ticker
+
 export configure_matplotlib_publication_style, remove_top_right_borders, remove_all_borders, set_max_ticks, hide_plot, cleanup_graph_axis
 
-function configure_matplotlib_publication_style()
+function configure_matplotlib_publication_style(rc)
 
     ## NSF Grant Settings
     rc("axes", linewidth=2)                                # but this works
@@ -51,8 +54,6 @@ function remove_all_borders(ax)
 end
 
 function set_max_ticks(ax)
-	using PyCall
-	@pyimport matplotlib.ticker as ticker
 	
     ax[:yaxis][:set_major_locator](ticker.MaxNLocator(5) )
     ax[:xaxis][:set_major_locator](ticker.MaxNLocator(5) )
