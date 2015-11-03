@@ -42,6 +42,8 @@ end
 function remove_top_right_borders(ax)
     ax[:spines]["right"][:set_visible](false)
     ax[:spines]["top"][:set_visible](false)
+    ax[:tick_params](labelcolor="none", top="off", right="off")
+	
     ax
 end
 
