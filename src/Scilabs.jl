@@ -17,6 +17,8 @@ export Web, writemime, load_md_table, glob, @pipe, @ls, @_, gpath, load_csv_tabl
 export OrderedDict, disp 
 export sort, filter
 
+export FN,FN21,FN21,FN22,FN32,FN42,FN52,FN53,FN54
+
 ## Notebook Web Content
 type Web
    content::String
@@ -38,6 +40,19 @@ end
 
 disp(x) = display(Web(x))
 
+# Function 
+function FN(x::Real, n=2, f=2)
+    abs(x) < 1/10^n || abs(x) > 10^n ? fmt(FormatSpec("$(n).$(f)e"), x) : fmt(FormatSpec("$(n).$(f)f"), x)
+end
+
+FN(n::Int=2, f::Int=2) = x-> FN(x, n, f)
+FN21(x) = FN(x, 2,1)
+FN22(x) = FN(x, 2,2)
+FN32(x) = FN(x, 3,2)
+FN42(x) = FN(x, 4,2)
+FN52(x) = FN(x, 5,2)
+FN53(x) = FN(x, 5,3)
+FN54(x) = FN(x, 5,4)
 
 ## Path Helpers
 function gpath(xs; path=".")
@@ -136,18 +151,18 @@ function load_md_table(testfile)
         y = ()
         if (isempty(y)) y = asint(x) end
         if (isempty(y)) y = asfloat(x) end
-        if (isempty(y)) y = x end
+        if (isempty(y)) y = string(x) end
         return y
     end
 
     load_md_table_raw(testfile, f= x->map(parser,x))
 end
 
-function load_csv_table(testfile; usesymbols=false)
+function load_csv_table(testfile; usesymbols=false, postProcessor=x->x)
     dataMat = readcsv(testfile)
     
     if usesymbols
-        headers = Symbol[ symbol(lowercase(d)) for d in dataMat[1,:] ]
+        headers = Symbol[ symbol(lowercase(replace(d, " ", ""))) for d in dataMat[1,:] ]
     else
         headers = String[ string(d) for d in dataMat[1,:] ]
     end
@@ -155,10 +170,10 @@ function load_csv_table(testfile; usesymbols=false)
     makeRow = dictFromArray(headers)    
     @show(headers, size(dataMat))
     
-    dat = Any[ ]
+    dat = @compat Associative{eltype(headers), Any}[]
     for i in 2:size(dataMat)[1]
         row = dataMat[i,:]
-        push!(dat, makeRow(row))
+        push!(dat, makeRow(row |> postProcessor))
     end
     
     return dat
