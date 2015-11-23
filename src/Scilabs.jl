@@ -129,6 +129,9 @@ simplify_mat(arr::Array{Float64,2}) = arr[:] # slicing???
 simplify_mat(o::Any) = o
 
 ## Markdown Helpers
+function simplify_test_data(testdata::Dict)
+    Dict( [ symbol(string(k)) => simplify_mat(v) for (k,v) in testdata])
+end
 
 function load_md_table_raw(testfile; f::Function=(x)->x)
     tests = open("$testfile") do f readlines(f) end
