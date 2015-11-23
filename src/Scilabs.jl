@@ -14,6 +14,7 @@ using Pipe
 # using Memoize
 
 export Web, writemime, load_md_table, glob, @pipe, @ls, @_, gpath, load_csv_table
+export simplify_test_data
 export OrderedDict, disp 
 export sort, filter
 

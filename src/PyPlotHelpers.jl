@@ -26,8 +26,11 @@ function configure_matplotlib_publication_style(rc)
     rc("legend", frameon=true, handlelength=1.5)
     rc("text", usetex=false)
 
-    rc("grid", linestyle="-", color="lightgrey" )
-    rc("axes", grid = true)
+    # rc("grid", linestyle="-", color="lightgrey" )
+    # rc("grid", visible=false)
+    rc("axes",grid=false)
+	
+    # rc("axes", grid = true)
     rc("axes", labelweight="normal" )
     rc("axes.formatter", use_mathtext=false )
 
@@ -36,13 +39,16 @@ function configure_matplotlib_publication_style(rc)
     rc("ytick", labelsize=15)
     rc("legend", scatterpoints = 1)
 
+	rc("svg", fonttype = "none")
+
+	# print("test")
     return;
 end
 
 function remove_top_right_borders(ax)
     ax[:spines]["right"][:set_visible](false)
     ax[:spines]["top"][:set_visible](false)
-    ax[:tick_params](labelcolor="none", top="off", right="off")
+    # ax[:tick_params](labelcolor="none", top="off", right="off")
 	
     ax
 end
