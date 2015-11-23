@@ -181,6 +181,7 @@ end
 
 
 include("Fitting.jl")
+include("PyPlotHelpers.jl")
 
 
 end

@@ -43,7 +43,7 @@ arrayFromDictKeyArray(d::Dict, keys::Array, exclude...) = [ d[k] for k in filter
 
 ## Plotting Configs ##
 
-function configure_matplotlib_publication_style()
+function configure_matplotlib_publication_style(rc)
 
     ## NSF Grant Settings
     rc("axes", linewidth=2)                                # but this works
@@ -73,6 +73,8 @@ function configure_matplotlib_publication_style()
     rc("xtick", labelsize=15)
     rc("ytick", labelsize=15)
     rc("legend", scatterpoints = 1)
+
+	rc("svg.fonttype", "none")
 
     return;
 end
